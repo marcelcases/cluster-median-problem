@@ -1,0 +1,150 @@
+# OTDM Lab 3: run file
+# Marcel, Mengxue
+# Autumn 2021
+
+# To run this file:
+#	$> ampl: include cmp.run;
+
+
+#########
+# SETUP #
+#########
+
+reset;
+model cmp.mod;
+data "./data/moons.dat"; #s1 #spiral #worms #moons
+
+option solver cplex; #gurobi
+
+#display A;
+display k,m,n;
+
+
+#################
+# PREPROCESSING #
+#################
+
+# Calculate Euclidean distances matrix
+#for {i in {1..m}} {
+#	for {j in {1..m}} {
+#		let D[i,j] := sqrt((A[j,1] - A[i,1])^2 + (A[j,2] - A[i,2])^2);
+#	}
+#}
+
+# Calculate n-dimensional Euclidean distances matrix D
+param partsum default 0;
+for {i in {1..m}} {
+	for {j in {1..m}} {
+		for {dim in {1..n}} {
+			let partsum := partsum + (A[j,dim] - A[i,dim])^2
+		}
+		let D[i,j] := sqrt(partsum);
+		let partsum := 0;
+	}
+}
+
+#display D;
+
+
+#########
+# SOLVE #
+#########
+
+problem CMP: x, objf, c1, c2, c3;
+solve CMP;
+#display x;
+#display x > './out/x.txt';
+
+
+###################
+# POST-PROCESSING #
+###################
+
+var clusters{i in 1..m};
+
+for{i in 1..m} {
+	for{j in 1..m} {
+		let clusters[i] := clusters[i] + x[j,i];
+	}
+}
+
+print "";
+for{i in 1..m} {
+	if clusters[i] > 0 then {
+		print "Cluster", i, "has", clusters[i], "points";
+	}
+}
+
+print "";
+for{i in 1..m} {
+	for{j in 1..m} {
+		if x[i,j] > 0 then {
+			print "Point", i, "belongs to cluster", j;
+		}
+	}
+}
+
+display _total_solve_elapsed_time;
+
+#display clusters;
+#display clusters > './out/clusters.txt';
+
+
+
+#########
+# TRAIN #
+#########
+
+# Solve the primal
+#reset;
+#print "SVM_PRIMAL:";
+
+#model svm-primal.mod;
+#data "./data/size2000-seed75421.dat"; #spambase #size100-seed66407 #size2000-seed75421
+
+#option solver cplex; #gurobi
+
+#problem SVM_PRIMAL: w, gamma, s, primal, c1, c2;
+#solve SVM_PRIMAL;
+#display w, gamma, s;
+
+
+# Compute w, gamma from the dual solution
+#param w {1..n};
+#let {j in {1..n}} w[j] := sum{i in {1..m}} lambda[i]*y_train[i]*A_train[i,j];
+#display w;
+
+#param gamma;
+#for {i in {1..m}} {
+#	if lambda[i] > 0.01 and lambda[i] < nu*0.99 then {
+#		# A support vector point was found
+#		let gamma := 1/y_train[i] - sum{j in {1..n}} w[j]*A_train[i,j];
+#		break;
+#	}
+#}
+#display gamma;
+
+
+
+
+########
+# TEST #
+########
+
+# Predict values with the test dataset
+#param y_pred {1..m};
+#let {i in {1..m}} y_pred[i] := gamma + sum{j in {1..n}}w[j]*A_test[i,j];
+#let {i in {1..m}} y_pred[i] := if y_pred[i] <= 0 then -1 else 1;
+#display y_pred;
+
+# Check misclassifications
+#param misclassifications default 0;
+#for {i in {1..m}} {
+#	if y_pred[i] != y_test[i] then
+#		let misclassifications := misclassifications + 1;
+#}
+
+#display misclassifications;
+
+#param accuracy = (m - misclassifications) / m;
+#display accuracy;
