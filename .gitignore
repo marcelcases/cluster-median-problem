@@ -1,0 +1,7 @@
+*.pdf
+*.xlsx
+*.docx
+*.zip
+/old/*
+/ref/*
+*/__pycache__/*
