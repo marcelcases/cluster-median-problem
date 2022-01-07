@@ -150,7 +150,7 @@ Plot of the Minimum Spanning Tree solution obtained with Prim's algorithm:
 
 In S1 dataset, CMP perfectly clustered the data in groups of similar size of points, while MST also created clusters of data but has a tendency to leave distant single points isolated in clusters of one point. Furthermore, MST joins some of the clusters that overlap. This is a consequence of the greedy behavior. CMP outperforms MST in terms of quality of the solution.
 
-It can be observed from Moons dataset results, where the data has a defined shape, that CMP is not able to identify the original shape and clusters the points by partitioning the two "natural" clusters. On the other side, MST is able to adapt its segments to the shape of the data. In this dataset, MST clearly outperforms CMP.
+It can be observed from Moons dataset results, where the data has a well-defined shape, that CMP is not able to identify the original shape and clusters the points by partitioning the two "natural" clusters. On the other side, MST is able to adapt its segments to the shape of the data. In this dataset, MST clearly outperforms CMP.
 
 In Spiral dataset, we obtain similar results as in the Moons, where CMP is not able to identify the shape of the data but MST does it very well.
 
@@ -188,7 +188,7 @@ There is no strong conclusion on which of the two algorithms is better. They are
 |-----------------|---------------------------------------------------------------------------------------------------------------------------------------|
 | `cmp.mod`       | AMPL code of the CMP model                                                                                                            |
 | `cmp.run`       | AMPL runfile, with preprocessing, solving and post-processing (data reporting)                                                    |
-| `mst.py`        | Prim's algorithm of the MSP in Python. Contains preprocessing, the algorithm, plotting and data reporting                                             |
+| `mst.py`        | Prim's algorithm of the MST in Python. Contains preprocessing, the algorithm, plotting and data reporting                                             |
 | `data/*.dat`    | AMPL input data for each dataset                                                                                                      |
 | `data/*.py`     | Python input data for each dataset                                                                                                    |
 | `gen/gen.py`    | Moons dataset generator                                                                                                               |
